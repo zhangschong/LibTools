@@ -7,7 +7,7 @@ import android.os.Looper;
  * 默认的{@link IRunnableManager}
  */
 
-class MainThreadRunnableManager implements IRunnableManager{
+class MainThreadRunnableManager implements IRunnableManager {
 
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private Thread mMainThread = Looper.getMainLooper().getThread();

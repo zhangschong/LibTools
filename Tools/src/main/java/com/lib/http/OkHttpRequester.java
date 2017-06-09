@@ -2,9 +2,9 @@ package com.lib.http;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
 import com.lib.mthdone.IMethodDone;
 import com.lib.mthdone.MethodTag;
-import com.google.gson.Gson;
 import com.lib.utils.GsonUtil;
 import com.lib.utils.LogUtils;
 
@@ -13,7 +13,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 

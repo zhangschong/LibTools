@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
  * 异步处理者
  */
 
-public class FixedThreadRunnableManager implements IRunnableManager{
+public class FixedThreadRunnableManager implements IRunnableManager {
 
     private ExecutorService mFixedThreadExecutor;
 
