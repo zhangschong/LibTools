@@ -39,16 +39,26 @@ public class MockRequester implements IHttpRequester {
     }
 
     @Override
-    public boolean request(Method method, Object callBack, Class cls, Object... objs) {
-        MethodDone.doItWithParamTypes(this, "createData", new Class[]{Method.class, Object.class, Object[].class}, method, callBack, cls, objs);
-        return true;
+    public RequestCall request(Method method, Object callBack, Class cls, Object... objs) {
+        MethodDone.doIt(this, "createData", method, callBack, cls, objs);
+        return null;
     }
 
     @MethodTag(threadType = IMethodDone.THREAD_TYPE_THREAD)
     private void createData(Method method, Object callBack, Class cls, Object... objs) throws InstantiationException, IllegalAccessException {
         DefaultResponse response = DefaultResponse.createResponse(method, objs);
         response.setData(createClass(cls));
-        MethodDone.doItWithParamTypes(callBack, CALL_BACK_SUCCEED, new Class[]{Response.class}, response);
+//        MethodDone.doIt(callBack, CALL_BACK_SUCCEED, response);
+    }
+
+    @Override
+    public void setTimeOut(int timeMills) {
+
+    }
+
+    @Override
+    public void setRootUrl(String rootUrl) {
+
     }
 
 

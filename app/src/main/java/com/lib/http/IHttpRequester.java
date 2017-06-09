@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
@@ -17,12 +18,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public interface IHttpRequester extends IManager {
 
     /**
-     * 请求成功后，将会调用callback实例中的方法onResponse(Response)
+     * 请求成功后，将会调用callback实例中的方法onResponse(RequestCall)
      */
     String CALL_BACK_SUCCEED = "onResponse";
 
     /**
-     * 请求失败后，将会调用callback实例中的方法onResponseErr(RepErrMsg)
+     * 请求失败后，将会调用callback实例中的方法onResponseErr(RequestCall,RepErrMsg)
      */
     String CALL_BACK_ERR = "onResponseErr";
 
@@ -32,6 +33,22 @@ public interface IHttpRequester extends IManager {
     int NETWORK_ERR = 10002;
     /** 数据错误 */
     int DATA_ERR = 10003;
+    /** 请求取消 */
+    int CANCELED_ERR = 10004;
+
+    /**
+     * 设置默认超时
+     *
+     * @param timeMills
+     */
+    void setTimeOut(int timeMills);
+
+    /**
+     * 设置根地址
+     *
+     * @param rootUrl
+     */
+    void setRootUrl(String rootUrl);
 
     /**
      * 请求数据时调用
@@ -42,37 +59,16 @@ public interface IHttpRequester extends IManager {
      * @param params
      * @return
      */
-    boolean request(Method method, Object callBack, Class dataCls, Object... params);
+    <T> RequestCall<T> request(Method method, Object callBack, Class dataCls, Object... params);
 
 
     /**
-     * 请求后的数据回调,在{@link IHttpRequester#request(Method, Object, Class, Object...)}中的instance的类onRespose(Response rs)中返回数据
+     * 默认的callback
      */
-    interface Response {
+    interface Callback {
+        void onResponse(RequestCall call);
 
-        /**
-         * 请求的url
-         *
-         * @return
-         */
-        String url();
-
-        /**
-         * 获取请求参数,与{@link IHttpRequester#request(Method, Object, Class, Object...)}中的Object[]参数相同
-         *
-         * @param key 与{@link RequestKes#value()}相同
-         * @param <T>
-         * @return
-         */
-        <T> T getParameter(String key);
-
-        /**
-         * 获取返回数据
-         *
-         * @param <T>
-         * @return
-         */
-        <T> T getData();
+        void onResponseErr(RequestCall call, RepErrMsg msg);
     }
 
     /**
@@ -88,6 +84,24 @@ public interface IHttpRequester extends IManager {
         }
     }
 
+    @Documented
+    @Target(TYPE)
+    @Retention(RUNTIME)
+    @interface Settings {
+        /**
+         * 请求中断时间(秒)
+         *
+         * @return
+         */
+        int timeOutSeconds() default 20;
+
+        /**
+         * 默认的地址
+         *
+         * @return
+         */
+        String rootUrl() default "";
+    }
 
     @Documented
     @Target(METHOD)
@@ -120,7 +134,7 @@ public interface IHttpRequester extends IManager {
     }
 }
 
-class DefaultResponse implements IHttpRequester.Response {
+class DefaultResponse {
 
     private final String mUrl;
     private final Map<String, Object> mParams;
@@ -139,17 +153,14 @@ class DefaultResponse implements IHttpRequester.Response {
         return mParams;
     }
 
-    @Override
-    public String url() {
+    String url() {
         return mUrl;
     }
 
-    @Override
-    public <T> T getParameter(String key) {
+    <T> T getParameter(String key) {
         return (T) mParams.get(key);
     }
 
-    @Override
     public <T> T getData() {
         return (T) mData;
     }
